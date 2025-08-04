@@ -157,7 +157,7 @@ const MedicineFormAvail = ({ funref }) => {
      }
 
   return (
-    <div className="min-hient-to-br bg-gradient-to-br from-purple-300 via-blue-300 to-indigo-400 h-screen bg-gradflex flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-300 via-blue-300 to-indigo-400  bg-gradflex flex items-center justify-center p-4">
       <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-6 w-full max-w-3xl border border-white/20 animate-fade-in">
         {/* Header */}
         <div className="text-center mb-6">

@@ -211,7 +211,7 @@ const MedicineTodoList = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => fetchEmailDetails(medicine.email, medicine.id)}
                       disabled={loadingEmail === medicine.id}
