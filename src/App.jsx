@@ -47,8 +47,10 @@ function App() {
           <Route index element={<Dashboard></Dashboard>}></Route>
           <Route path='doner-detail' element={<DonorMedicineForm></DonorMedicineForm>}></Route>
            <Route path='medicine-available' element={<MedicineFormAvail></MedicineFormAvail>}></Route>
+                <Route path='/donor-navbar/medicine-available' element={<MedicineFormAvail></MedicineFormAvail>}></Route>
            <Route path='avail-equipment' element={<EquipmentForm></EquipmentForm>}></Route>
           <Route path='todolist' element={<MedicineTodoList></MedicineTodoList>}></Route>
+             <Route path='/donor-navbar/todolist' element={<MedicineTodoList></MedicineTodoList>}></Route>
           <Route path='change-password' element={<ChangePasswordForm></ChangePasswordForm>}></Route>
           {/* home page */}
          </Route>

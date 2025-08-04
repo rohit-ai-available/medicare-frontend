@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { server_url } from '../config/url';
+import { useNavigate } from 'react-router-dom';
 const MedicineFormAvail = ({ funref }) => {
+  let navigate=useNavigate()
   const [formData, setFormData] = useState({
     email: '',
     medicine: '',
@@ -82,7 +84,8 @@ const MedicineFormAvail = ({ funref }) => {
           else{
             alert(JSON.stringify(resp.data))
           }
-    alert("Record updated")
+    alert("Record updated") 
+       navigate('/donor-navbar/todolist')
     return;
    }
    alert()
@@ -94,6 +97,7 @@ const MedicineFormAvail = ({ funref }) => {
     }
 
     setIsLoading(true);
+
 
     try {
             

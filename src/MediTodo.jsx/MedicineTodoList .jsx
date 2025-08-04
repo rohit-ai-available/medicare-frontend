@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios'
 import { Plus, Mail, Edit, Trash2, Search, X } from 'lucide-react';
 import { server_url } from '../config/url';
+import { useNavigate } from 'react-router-dom';
 
 const MedicineTodoList = () => {
   const [medicines, setMedicines] = useState([]);
@@ -10,7 +11,7 @@ const MedicineTodoList = () => {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ name: '', email: '' });
   const [loadingEmail, setLoadingEmail] = useState(null);
-
+   let navigate=useNavigate()
   // Mock email data for demonstration
   const mockEmailData = {
     '': {
@@ -131,7 +132,11 @@ const MedicineTodoList = () => {
       med.id === id ? { ...med, completed: !med.completed } : med
     ));
   };
-
+ /// edit medicine
+   function EditMedicine(){
+    alert("edit")
+    navigate('/donor-navbar/medicine-available')
+   }
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-blue-400 to-indigo-400 p-6">
       <div className="max-w-4xl mx-auto">
@@ -233,7 +238,7 @@ const MedicineTodoList = () => {
                       Delete
                     </button>
                            <button
-                      onClick={() => deleteMedicine(medicine.email, medicine.id)}
+                      onClick={EditMedicine}
                       disabled={loadingEmail === medicine.id}
                       className="bg-blue-500/70 hover:bg-blue-500/80 text-white px-4 py-2 rounded-lg font-medium 
                       transition-all duration-200 flex items-center gap-2"
