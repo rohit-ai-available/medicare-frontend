@@ -43,8 +43,10 @@ const LoginForm = () => {
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+    setIsLoading(true)
     return newErrors;
+
+    
   };
 
   const handleSubmit = async (e) => {
@@ -52,9 +54,11 @@ const LoginForm = () => {
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      setIsLoading(false)
       return;
     }
-     
+        //setIsLoading(ture)
+       
          let url = server_url+"/user/login";
              
               let resp = await axios.post(url, formData, {
@@ -84,7 +88,7 @@ const LoginForm = () => {
             alert(JSON.stringify(resp.data))
           }
 
-    setIsLoading(true);
+    // setIsLoading(true);
     
     // Simulate API call
     setTimeout(() => {

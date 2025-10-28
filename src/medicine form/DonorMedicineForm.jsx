@@ -19,6 +19,7 @@ export default function DonorMedicineForm({refAvailMedi}) {
   
   const [fetchedData, setFetchedData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+   const [loading, setLoading] = useState(false);
   const [aadhaarPreview, setAadhaarPreview] = useState(null);
   const [profilePreview, setProfilePreview] = useState(null);
 
@@ -64,7 +65,7 @@ export default function DonorMedicineForm({refAvailMedi}) {
   };
 
   const handleFetchEmail = async () => {
-   // setIsLoading(true);
+    setIsLoading(true);
     alert()
     
         let url = server_url+"/user/find";
@@ -102,6 +103,13 @@ export default function DonorMedicineForm({refAvailMedi}) {
   };
 
   const handleSave = async() => {
+    if(aadhaarPreview==null && profilePreview==null){
+      alert("upload your adhaarCard and Profile pic")
+      return;
+    }
+      
+    setLoading(true)
+
    // alert(JSON.stringify(formData))
       let fd=new FormData();
   for(let prop in formData)
@@ -111,17 +119,20 @@ export default function DonorMedicineForm({refAvailMedi}) {
         let url = server_url+"/user/doner";
                  
                  let resp = await axios.post(url, fd, {headers: {'Content-Type': 'multipart/form-data'  } });
-          //alert(JSON.stringify(resp.data));
+          // alert(JSON.stringify(resp.data));
               if(resp.data.status==true){
                 alert(JSON.stringify(resp.data.msg))
                 let data=resp.data.status;
                 refAvailMedi(data)
               }
               else{
-                alert(resp.data)
+                   alert(JSON.stringify(resp.data));
+                   setLoading(false)
+                   return;
               }
 
     console.log('Form saved:', formData);
+    setLoading(false)
     alert('Medicine donation form saved successfully!');
   };
 
@@ -386,10 +397,21 @@ export default function DonorMedicineForm({refAvailMedi}) {
               <button
                 type="button"
                 onClick={handleSave}
+                  disabled={loading}
                 className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
               >
-                <Save className="w-5 h-5" />
-                Save Form
+         {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                         saving...
+                        </>
+                      ) : (
+                        <>
+                    <Save className="w-5 h-5" />
+                     Save Form
+                        </>
+                      )}        
+             
               </button>
               <button
                 type="button"
