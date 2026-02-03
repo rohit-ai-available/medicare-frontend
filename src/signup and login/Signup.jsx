@@ -47,6 +47,7 @@ export default function SignupComponent() {
    const  handleSubmit = async () => {
      //  alert(JSON.stringify(formData))
       if (!validateForm()) return;
+        setIsSubmitting(true);
          let url = server_url+"/user/signup";
              
               let resp = await axios.post(url, formData, {
@@ -57,10 +58,11 @@ export default function SignupComponent() {
             alert(JSON.stringify(resp.data.msg))
           }
           else{
+             // alert("ppppp")
             alert(JSON.stringify(resp.data))
+             setIsSubmitting(false);
+            return;
           }
-    
-    setIsSubmitting(true);
     
     // Simulate API call
     setTimeout(() => {
