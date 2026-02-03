@@ -108,10 +108,12 @@ const LoginForm = () => {
   };
 
   const handleForgotPassword = () => {
-    const email = prompt('Enter your email address:');
-    if (email) {
-      alert(`Password reset link sent to ${email}`);
-    }
+    // const email = prompt('Enter your email address:');
+    // if (email) {
+    //   alert(`Password reset link sent to ${email}`);
+    // }
+   // alert()
+     navigate('/login/forgot')
   };
 
   return (

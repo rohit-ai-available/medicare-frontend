@@ -37,7 +37,7 @@ export default function DonorMedicineForm({refAvailMedi}) {
       setFormData(prev => ({
         ...prev,
         [fieldName]: file
-      }));
+      })); 
       
       // Create preview
       const reader = new FileReader();

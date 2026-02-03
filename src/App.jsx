@@ -20,6 +20,8 @@ import NeedyNavbar from './NeedyNavbar'
 import EquipmentForm from './equipment/EquipmentForm'
 import EquipmentCards from './find equpment/EquipmentCards '
 import MedicineDonorContact from './medicine finder/MedicineDonorContact'
+import EmailLogin from './login-with-email/EmailLogin'
+import OTPVerification from './otp-verification/OTPVerification'
 function App() {
 
   return (
@@ -39,7 +41,9 @@ function App() {
         <Route path='/' element={<MedicineDonationNavbar></MedicineDonationNavbar>}>
         <Route index element={<MedicineDonationIndex></MedicineDonationIndex>}></Route>
           <Route path='/signup' element={<SignupComponent></SignupComponent>}></Route>
-         <Route path='/login' element={<LoginForm></LoginForm>}></Route>
+          <Route path='/login' element={<LoginForm></LoginForm>}></Route>
+          <Route path='/login/forgot' element={<EmailLogin></EmailLogin>}></Route>
+            <Route path='/login/verify' element={<OTPVerification></OTPVerification>}></Route>
         
         </Route>
         {/* donor dashboard navbar */}
