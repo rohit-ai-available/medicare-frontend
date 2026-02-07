@@ -58,7 +58,7 @@ export default function SignupComponent() {
             alert(JSON.stringify(resp.data.msg))
           }
           else{
-             // alert("ppppp")
+             //alert("ppppp")
             alert(JSON.stringify(resp.data))
              setIsSubmitting(false);
             return;

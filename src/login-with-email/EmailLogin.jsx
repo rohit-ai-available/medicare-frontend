@@ -35,7 +35,9 @@ export default function EmailLogin() {
               });
               localStorage.setItem("emailid",email)
                 await new Promise(resolve => setTimeout(resolve, 1500));
+                if(resp.data.success){
                 navigate('/login/verify')
+                }
                  alert(JSON.stringify(resp.data.message))
     //   await new Promise(resolve => setTimeout(resolve, 1500));
       setMessage(`Login link sent to ${email}`);

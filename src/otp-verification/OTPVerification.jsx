@@ -51,7 +51,7 @@ export default function OTPVerification() {
                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
               }); 
                 setLoading(false)
-                alert(JSON.stringify(resp.data))
+               // alert(JSON.stringify(resp.data))
                if(resp.data){
                 alert(resp.data.message)
                 if(resp.data.obj.userType=="doner"){
