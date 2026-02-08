@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, CheckCircle, XCircle, ChevronDown } from 'lucide-react';
 import axios from 'axios';
 import { server_url } from '../config/url';
+import { useNavigate } from 'react-router-dom';
 
 export default function SignupComponent() {
   const [formData, setFormData] = useState({
@@ -15,12 +16,16 @@ export default function SignupComponent() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-
+  const navigate=useNavigate()
   const userTypes = [
     { value: 'needy', label: 'Needy' },
     { value: 'doner', label: 'Doner' }
   ];
-
+  
+   function dosignin(){
+    //alert()
+     navigate('/login');
+   }
   const validateForm = () => {
     const newErrors = {};
     
@@ -306,7 +311,7 @@ export default function SignupComponent() {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Already have an account?{' '}
-            <a href="#" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+            <a href="#" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors" onClick={dosignin}>
               Sign in here
             </a>
           </p>
