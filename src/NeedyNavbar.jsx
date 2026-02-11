@@ -10,7 +10,7 @@ export default function MedicineDonationNavbar({}) {
 
   return (
     <>
-    <div className='bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-300'>
+    <div className=' bg-gradient-to-r from-purple-500 to-indigo-500'>
       <header className="bg-white/10 backdrop-blur-sm border-b border-white/20">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
