@@ -38,7 +38,7 @@ export default function EmailLogin() {
                 if(resp.data.success){
                 navigate('/login/verify')
                 }
-                 alert(JSON.stringify(resp.data.message))
+                 alert(JSON.stringify(resp.data.error))
     //   await new Promise(resolve => setTimeout(resolve, 1500));
       setMessage(`Login link sent to ${email}`);
       setEmail('');
