@@ -13,6 +13,18 @@ const NeedyDashboard = () => {
     let token = localStorage.getItem('logintoken');
     if (!token) {
       navigate('/');
+        async function fetchdata(){
+       let resp=await axios.post(server_url+"/user/dashboard",{},{
+        headers:{Authorization:`Bearer ${token}`}
+      })
+      //  alert(JSON.stringify(resp))
+      if(resp.data.status==false){
+        navigate('/');
+          alert("please Re-login")
+      }
+     }
+      
+   fetchdata()
     }
   });
 

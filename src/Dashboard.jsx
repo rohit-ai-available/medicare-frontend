@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Package, CheckSquare, Lock, LogOut, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { server_url } from './config/url';
 
 const DonorMedicineDashboard = () => {
   const navigate = useNavigate();
@@ -9,9 +11,22 @@ const DonorMedicineDashboard = () => {
   
   useEffect(() => {
     let token = localStorage.getItem('logintoken');
+   // alert(token)
     if (!token) {
       navigate('/');
     }
+     async function fetchdata(){
+       let resp=await axios.post(server_url+"/user/dashboard",{},{
+        headers:{Authorization:`Bearer ${token}`}
+      })
+      //  alert(JSON.stringify(resp))
+      if(resp.data.status==false){
+        navigate('/');
+          alert("please Re-login")
+      }
+     }
+      
+   fetchdata()
   });
   
   let email = localStorage.getItem('email');

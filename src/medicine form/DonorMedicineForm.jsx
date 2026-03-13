@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import axios from "axios";
 import { User, Mail, Calendar, Pill, Search, Phone, MapPin, GraduationCap, Briefcase, Upload, Camera, FileText, Save, Edit } from 'lucide-react';
 import { server_url } from '../config/url';
+import { useEffect } from 'react';
+import { Auth } from '../global-AUTH/Auth';
 
 export default function DonorMedicineForm({refAvailMedi}) {
+    useEffect(()=>{
+      Auth()
+    })
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -16,6 +21,7 @@ export default function DonorMedicineForm({refAvailMedi}) {
     aadhaarCard: null,
     profilePic: null
   });
+  
   
   const [fetchedData, setFetchedData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
