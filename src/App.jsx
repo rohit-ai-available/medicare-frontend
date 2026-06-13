@@ -22,6 +22,7 @@ import EquipmentCards from './find equpment/EquipmentCards '
 import MedicineDonorContact from './medicine finder/MedicineDonorContact'
 import EmailLogin from './login-with-email/EmailLogin'
 import OTPVerification from './otp-verification/OTPVerification'
+import Payment from './Payment'
 function App() {
 
   return (
@@ -44,6 +45,7 @@ function App() {
           <Route path='/login' element={<LoginForm></LoginForm>}></Route>
           <Route path='/login/forgot' element={<EmailLogin></EmailLogin>}></Route>
             <Route path='/login/verify' element={<OTPVerification></OTPVerification>}></Route>
+            <Route path='/donate-funds' element={<Payment></Payment>}></Route>
         
         </Route>
         {/* donor dashboard navbar */}

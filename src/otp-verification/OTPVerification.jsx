@@ -11,7 +11,6 @@ export default function OTPVerification() {
   const inputRefs = useRef([]);
   const navigate = useNavigate();
         var emailid=localStorage.getItem("emailid")
-      //  alert(emailid)
   const handleChange = (index, value) => {
     if (!/^\d*$/.test(value)) return;
     

@@ -4,11 +4,12 @@ import './index.css'
 import App from './App.jsx'
 import {BrowserRouter} from 'react-router-dom'
 import DonorMedicineDashboard from './Dashboard.jsx'
+import Payment from './Payment.jsx'
 createRoot(document.getElementById('root')).render(
   <>
   <BrowserRouter>
     <App />
-    {/* <DonorMedicineDashboard></DonorMedicineDashboard> */}
     </BrowserRouter>
+    {/* <Payment></Payment> */}
   </>
 )
