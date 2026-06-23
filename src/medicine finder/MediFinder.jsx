@@ -1,91 +1,133 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin,Building2,Layers,Info, Package, Calendar, User, Phone, Mail } from 'lucide-react';
-import axios from 'axios'
+import { Search, MapPin, Building2, Layers, Info, Package, Calendar, User, Phone, Send, X } from 'lucide-react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { server_url } from '../config/url';
+
 const MediFinder = () => {
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState('');
   const [medicineName, setMedicineName] = useState('');
   const [loading, setLoading] = useState(false);
-   const [jsonary,setjsonary] = useState([]);
+  const [jsonary, setjsonary] = useState([]);
   const [citiesLoading, setCitiesLoading] = useState(true);
 
-  const navigate=useNavigate()
-     /// automaticallly filled cities in the combo box
-       useEffect(()=>{
-             async function fetchdata() {
-             // alert()
-               setCitiesLoading(true);
-                let url = server_url+"/user/medifinder";
-                       let resp = await axios.post(url, {
-                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                       });
-              //alert(JSON.stringify(resp.data));
-                   if(resp){
-                    setCities(resp.data)
-                     //alert(city)
-                     
-                   }
-                   else{
-                     alert(JSON.stringify(resp.data))
-                   }  
-                    setCitiesLoading(false);
-             }
-             fetchdata();
-         },[])
+  // New states for handling the Request Modal Form
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [targetMedicine, setTargetMedicine] = useState('');
+  const [targetDonorEmail, setTargetDonorEmail] = useState('');
+  const [needyEmail, setNeedyEmail] = useState('');
+  const [requestLoading, setRequestLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  /// automatically filled cities in the combo box
+  useEffect(() => {
+    async function fetchdata() {
+      setCitiesLoading(true);
+      let url = server_url + "/user/medifinder";
+      let resp = await axios.post(url, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+      if (resp) {
+        setCities(resp.data);
+      } else {
+        alert(JSON.stringify(resp.data));
+      }
+      setCitiesLoading(false);
+    }
+    fetchdata();
+  }, []);
+
   // Function to search medicines
   const searchMedicines = async (city, medicine) => {
-           if(city=='' || medicine==''){
-            return -1;
-           }
-           setLoading(true)
+    if (city == '' || medicine == '') {
+      return -1;
+    }
+    setLoading(true);
   };
+
   // Handle fetch button click
-  const handleFetch = async() => {
+  const handleFetch = async () => {
     if (!selectedCity && !medicineName) {
       alert('Please select a city or enter a medicine name');
       return;
     }
-  let ans=await searchMedicines(selectedCity, medicineName);
-        if(ans==-1){
-            alert("choose city or medicine name ")
-            return;
-        }
-     // alert(selectedCity+"  "+medicineName)
-      let formdata=new FormData()
-         formdata.append("city",selectedCity)
-         formdata.append("medicine",medicineName)
-      let url = server_url+"/user/fetchFinderData";
-         let resp = await axios.post(url,formdata, {
-                   headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    });
-                // alert(JSON.stringify(resp.data))
-                  setLoading(false)
-              let filterdata;
-                  if(resp){
-              ///  filterdata=resp.data.map((item)=>item)
-                   setjsonary(resp.data)
-              }
+    let ans = await searchMedicines(selectedCity, medicineName);
+    if (ans == -1) {
+      alert("choose city or medicine name ");
+      return;
+    }
+    let formdata = new FormData();
+    formdata.append("city", selectedCity);
+    formdata.append("medicine", medicineName);
+    let url = server_url + "/user/fetchFinderData";
+    let resp = await axios.post(url, formdata, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+    setLoading(false);
+    if (resp) {
+      setjsonary(resp.data);
+    }
   };
-  async function getcontact(email){
-   // alert(email)
-    let url = server_url+"/user/getcontact";
-         let resp = await axios.post(url,{'email':email}, {
-                   headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    });
-                    if(resp.data.status==true){
-                     // alert(JSON.stringify(resp.data.obj.contactNumber))
-                       navigate('/needy-navbar/contact-page')
-                       localStorage.setItem('contact',resp.data.obj.contactNumber)
-                    }
-                    else{
-                      alert(JSON.stringify(resp.data))
-                    }
+
+  async function getcontact(email) {
+    let url = server_url + "/user/getcontact";
+    let resp = await axios.post(url, { 'email': email }, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+    if (resp.data.status == true) {
+      navigate('/needy-navbar/contact-page');
+      localStorage.setItem('contact', resp.data.obj.contactNumber);
+    } else {
+      alert(JSON.stringify(resp.data));
+    }
   }
 
+  // Opens the tiny form popup modal
+  const openRequestModal = (medName, donorEmail) => {
+    // Automatically retrieve the logged-in user's email from localStorage
+    const savedEmail = localStorage.getItem("email") || "";
+    setNeedyEmail(savedEmail);
+    setTargetMedicine(medName);
+    setTargetDonorEmail(donorEmail);
+    setIsModalOpen(true);
+  };
+
+  // Submits the request form data to your Socket.io backend route
+  const handleSendRequest = async (e) => {
+    e.preventDefault();
+    if (!needyEmail) {
+      alert("Please log in or enter your Needy Email address.");
+      return;
+    }
+
+    setRequestLoading(true);
+    
+    try {
+      let url = server_url + "/user/requestmedicine";
+      let resp = await axios.post(url, {
+        medicineName: targetMedicine,
+        needyEmail: needyEmail,
+        donorEmail: targetDonorEmail // Tells the backend controller which socket id to push the message to
+      });
+    alert(JSON.stringify(resp.data))
+      if (resp.data.success) {
+        alert("Success: " + resp.data.msg);
+        setIsModalOpen(false); // Close Modal form
+      } else {
+        alert("Failed to process request: " + resp.data.msg);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error reaching server connection.");
+    } finally {
+      setRequestLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-200 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-200 p-6 relative">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -179,7 +221,7 @@ const MediFinder = () => {
                     <h3 className="text-xl font-bold">Medicine: {medicine.medicine}</h3>
                     <Package className="text-white opacity-80" size={24} />
                   </div>
-                  
+
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <User size={16} />
@@ -189,17 +231,17 @@ const MediFinder = () => {
                       <Building2 size={16} />
                       <span className="text-sm">Company: {medicine.company}</span>
                     </div>
-                     
+
                     <div className="flex items-center gap-2">
                       <MapPin size={16} />
                       <span className="text-sm">City: {medicine.city}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <Calendar size={16} />
                       <span className="text-sm">Expires: {medicine.expiryDate}</span>
                     </div>
-                     <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <Package size={16} />
                       <span className="text-sm">Packing: {medicine.packing}</span>
                     </div>
@@ -207,21 +249,28 @@ const MediFinder = () => {
                       <Layers size={16} />
                       <span className="text-sm">Quantity: {medicine.quantity}</span>
                     </div>
-                        <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <Info size={16} />
                       <span className="text-sm">Other Information: {medicine.otherInfo}</span>
                     </div>
-        
+
+                    {/* TWO BUTTON FOOTER GRID LINK */}
                     <div className="flex gap-2 pt-2">
-                      <a
-                    
-                        onClick={()=>getcontact(medicine.email)} 
-                        className="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 text-black py-2 px-3 rounded-md text-sm font-medium text-center transition-colors duration-200 flex items-center justify-center gap-1"
+                      <button
+                        onClick={() => getcontact(medicine.email)}
+                        className="flex-1  bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-md text-sm font-medium transition-colors duration-200 flex items-center justify-center gap-1 border border-white border-opacity-40"
                       >
                         <Phone size={14} />
                         Call
-                      </a>
-              
+                      </button>
+
+                      <button
+                        onClick={() => openRequestModal(medicine.medicine, medicine.email)}
+                        className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-md text-sm font-bold transition-colors duration-200 flex items-center justify-center gap-1 shadow-md"
+                      >
+                        <Send size={14} />
+                        Request
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -241,6 +290,83 @@ const MediFinder = () => {
           </div>
         )}
       </div>
+
+      {/* POPUP MODAL COMPONENT FORM */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95 duration-200 relative">
+            
+            {/* Close Cross icon Button */}
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 window-right right-4 text-gray-400 hover:text-gray-600 focus:outline-none"
+            >
+              <X size={20} />
+            </button>
+
+            <h3 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+              <Package className="text-purple-500" size={24} />
+              Request Medicine
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">Send an instant live dashboard alert notification to the donor.</p>
+
+            <form onSubmit={handleSendRequest} className="space-y-4">
+              {/* Field 1: Medicine Name (Read Only) */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                  Medicine Requested
+                </label>
+                <input
+                  type="text"
+                  value={targetMedicine}
+                  readOnly
+                  className="w-full bg-gray-100 border border-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium cursor-not-allowed outline-none"
+                />
+              </div>
+
+              {/* Field 2: Needy Email Input box */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                  Your Registered Email (Needy Email)
+                </label>
+                <input
+                  type="email"
+                  value={needyEmail}
+                  onChange={(e) => setNeedyEmail(e.target.value)}
+                  placeholder="Enter your email address..."
+                  required
+                  className="w-full border border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 rounded-lg px-4 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition-all"
+                />
+              </div>
+
+              {/* Action Buttons inside Form modal */}
+              <div className="flex gap-3 mt-6 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 border border-gray-300 text-gray-700 font-medium py-2.5 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={requestLoading}
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-2.5 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
+                >
+                  {requestLoading ? (
+                    <div className="h-5 w-5 border-b-2 border-white rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <Send size={16} />
+                      Request
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

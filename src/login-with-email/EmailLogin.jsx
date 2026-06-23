@@ -33,7 +33,7 @@ export default function EmailLogin() {
          let resp = await axios.post(url,{email:email}, {
                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
               });
-              alert(JSON.stringify(resp.data.message))
+              alert(JSON.stringify(resp.data))
               localStorage.setItem("emailid",email)
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 if(resp.data.success){

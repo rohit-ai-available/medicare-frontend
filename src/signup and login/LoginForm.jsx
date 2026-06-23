@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom'; // Added useSearchParams
 import { server_url } from '../config/url';
+
 const LoginForm = () => {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams(); // Hook to listen to '?verified=true'
+  const [showVerifiedBanner, setShowVerifiedBanner] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -13,6 +16,69 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  // Listen for redirection confirmation token parameter on mount
+  useEffect(() => {
+    if (searchParams.get('verified') === 'true') {
+      setShowVerifiedBanner(true);
+      
+      // Clean up the URL query params parameter cleanly so it resets gracefully on refresh
+      searchParams.delete('verified');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  // 1. Initialize Google Sign-In on mount
+  useEffect(() => {
+    /* global google */
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: "883991906771-tg29788uuvmqjpl74ar1oi5o6c4si40s.apps.googleusercontent.com", // Replace with your real Client ID
+        callback: handleGoogleLogin,
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById("googleSignInDiv"),
+        { theme: "outline", size: "large", width: "100%" } // width expanded to fit your layout nicely
+      );
+    }
+  }, []);
+
+  // 2. Handle Google Login Callback
+  const handleGoogleLogin = async (response) => {
+    try {
+      setIsLoading(true);
+      console.log("Google Token:", response.credential);
+
+      // Using your existing axios pattern. Adjust the endpoint path to match your actual backend configuration
+      let url = server_url+"/user/google-login"; 
+      
+      let resp = await axios.post(url, { credential: response.credential }, {
+        headers: { "Content-Type": "application/json" },
+      });
+         //alert(JSON.stringify(resp.data))
+      if (resp.data.status === true || resp.data.token) {
+        let logintoken = resp.data.token;
+        localStorage.setItem('logintoken', logintoken);
+        
+        // Handle post-login redirection based on your existing logic
+        if (resp.data.obj?.userType === "needy") {
+          localStorage.setItem('email', resp.data.obj.email || '');
+          navigate('/needy-navbar');
+        } else {
+          localStorage.setItem('email', resp.data.obj?.email || '');
+          navigate('/donor-navbar');
+        }
+      } else {
+        alert(JSON.stringify(resp.data));
+      }
+    } catch (error) {
+      console.error("Google Auth Error:", error);
+      alert("Google Sign-In failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -20,7 +86,6 @@ const LoginForm = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -43,10 +108,8 @@ const LoginForm = () => {
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    setIsLoading(true)
+    setIsLoading(true);
     return newErrors;
-
-    
   };
 
   const handleSubmit = async (e) => {
@@ -54,47 +117,39 @@ const LoginForm = () => {
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      setIsLoading(false)
+      setIsLoading(false);
       return;
     }
-        //setIsLoading(ture)
        
-         let url = server_url+"/user/login";
-             
-              let resp = await axios.post(url, formData, {
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-              }); 
-              //alert()
-       // alert(JSON.stringify(resp.data.token));
-        let logintoken=resp.data.token;
-       
-          if(resp.data.status==true){
-            alert(JSON.stringify(resp.data.msg))
-            if(resp.data.obj.userType=="needy"){
-               localStorage.setItem('logintoken',logintoken)
-               localStorage.setItem('email',formData.email)
-              navigate('/needy-navbar')
-            }
-          else{
-             localStorage.setItem('logintoken',logintoken)
-             localStorage.setItem('email',formData.email)
-              navigate('/donor-navbar')
-          }
-            //let data=resp.data.status;
-           // funref(data)
-          }
-          else{
-         //   alert()
-            alert(JSON.stringify(resp.data))
-          }
+    let url = server_url + "/user/login";
+         
+    try {
+      let resp = await axios.post(url, formData, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      }); 
+      
+      let logintoken = resp.data.token;
+     
+      if (resp.data.status === true) {
+        alert(JSON.stringify(resp.data.msg));
+        if (resp.data.obj.userType === "needy") {
+          localStorage.setItem('logintoken', logintoken);
+          localStorage.setItem('email', formData.email);
+          navigate('/needy-navbar');
+        } else {
+          localStorage.setItem('logintoken', logintoken);
+          localStorage.setItem('email', formData.email);
+          navigate('/donor-navbar');
+        }
+      } else {
+        alert(JSON.stringify(resp.data));
+      }
+    } catch (err) {
+      console.error(err);
+    }
 
-    // setIsLoading(true);
-    
-    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-    
-      // Reset form
       setFormData({
         email: '',
         password: '',
@@ -103,22 +158,21 @@ const LoginForm = () => {
     }, 150);
   };
 
-  const handleSocialLogin = (provider) => {
-    alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login clicked!`);
-  };
-
   const handleForgotPassword = () => {
-    // const email = prompt('Enter your email address:');
-    // if (email) {
-    //   alert(`Password reset link sent to ${email}`);
-    // }
-   // alert()
-     navigate('/login/forgot')
+     navigate('/login/forgot');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-blue-400 to-indigo-400 flex items-center justify-center p-4">
       <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 w-full max-w-md border border-white/20 animate-fade-in">
+        
+        {/* Verification Success Alert Banner */}
+        {showVerifiedBanner && (
+          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-center text-sm font-semibold rounded-xl animate-bounce shadow-sm">
+            💚 Account activated successfully! You can now log in.
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent mb-2">
@@ -219,38 +273,34 @@ const LoginForm = () => {
               'Login'
             )}
           </button>
+
+          {/* Visual Divider between Regular login and Google login */}
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="flex-shrink mx-4 text-gray-400 text-sm">or</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+
+          {/* Google Sign-In Target Button */}
+          <div className="flex justify-center w-full">
+            <div id="googleSignInDiv" className="w-full"></div>
+          </div>
+
         </div>
 
         {/* Sign Up Link */}
-        <div className="text-center">
+        <div className="text-center mt-6">
           <p className="text-gray-600">
             Don't have an account?{' '}
             <button
               onClick={() => alert('Redirecting to signup page...')}
               className="text-purple-500 hover:text-purple-600 font-semibold transition-colors duration-200"
             >
-              Login
+              Sign Up
             </button>
           </p>
         </div>
       </div>
-
-      {/* <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out;
-        }
-      `}</style> */}
     </div>
   );
 };
