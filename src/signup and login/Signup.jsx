@@ -60,11 +60,11 @@ export default function SignupComponent() {
               });
       //alert(JSON.stringify(resp.data));
           if(resp.data.status==true){
-            alert(JSON.stringify(resp.data.msg))
+            alert(resp.data.message)
           }
           else{
              //alert("ppppp")
-            alert(JSON.stringify(resp.data))
+            alert(resp.data.message)
              setIsSubmitting(false);
             return;
           }

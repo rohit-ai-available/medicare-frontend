@@ -161,7 +161,9 @@ const LoginForm = () => {
   const handleForgotPassword = () => {
      navigate('/login/forgot');
   };
-
+  function dosignup(){
+    navigate("/signup")
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-blue-400 to-indigo-400 flex items-center justify-center p-4">
       <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 w-full max-w-md border border-white/20 animate-fade-in">
@@ -293,7 +295,7 @@ const LoginForm = () => {
           <p className="text-gray-600">
             Don't have an account?{' '}
             <button
-              onClick={() => alert('Redirecting to signup page...')}
+              onClick={dosignup}
               className="text-purple-500 hover:text-purple-600 font-semibold transition-colors duration-200"
             >
               Sign Up
