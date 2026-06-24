@@ -32,7 +32,7 @@ const LoginForm = () => {
     /* global google */
     if (window.google) {
       window.google.accounts.id.initialize({
-        client_id: "883991906771-tg29788uuvmqjpl74ar1oi5o6c4si40s.apps.googleusercontent.com", // Replace with your real Client ID
+        client_id: "442871528221-u6i1i9em83n34mvtko19j1drtk1bus7k.apps.googleusercontent.com", // Replace with your real Client ID
         callback: handleGoogleLogin,
       });
 
